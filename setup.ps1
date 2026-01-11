@@ -21,7 +21,7 @@ Write-Host "[3/4] Installing dependencies..." -ForegroundColor Yellow
 pip install -r requirements.txt -r requirements-dev.txt --quiet
 
 Write-Host "[4/4] Verifying installation..." -ForegroundColor Yellow
-python -c "import PyQt6; print('PyQt6:', PyQt6.__version__)"
+python -c "from PyQt6.QtCore import PYQT_VERSION_STR; print('PyQt6:', PYQT_VERSION_STR)"
 
 Write-Host "`n Setup complete!" -ForegroundColor Green
 Write-Host "`nTo run the app:" -ForegroundColor Cyan

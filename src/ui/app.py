@@ -25,6 +25,7 @@ from .library import LibraryView
 from .settings import SettingsPanel
 from .queue_widget import QueueWidget
 from .preview_card import PreviewCard
+from .system_tray import SystemTray
 
 
 class UpdateWorker(QThread):
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} v{__version__}")
         self.setMinimumSize(1000, 700)
+        self._set_window_icon()
 
         # Initialize core components
         self.config = ConfigManager()
@@ -82,9 +84,26 @@ class MainWindow(QMainWindow):
         self._apply_styles()
         self._connect_signals()
         self._setup_watcher()
+        self._setup_system_tray()
 
         if self.config.get("check_updates_on_startup", True):
             self._check_for_updates()
+
+    def _set_window_icon(self):
+        """Set the application window icon."""
+        import sys
+        from PyQt6.QtGui import QIcon
+        if getattr(sys, 'frozen', False):
+            # Running as compiled executable
+            import os
+            base_path = sys._MEIPASS
+            icon_path = os.path.join(base_path, 'assets', 'icon.png')
+        else:
+            # Running from source
+            import os
+            icon_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'icon.png')
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
 
     def _setup_ui(self):
         """Initialize UI components."""
@@ -234,6 +253,51 @@ class MainWindow(QMainWindow):
                 self.watcher.set_watch_path(path)
                 self.watcher.start()
                 self._show_status(f"Watching: {path}")
+
+    def _setup_system_tray(self):
+        """Setup system tray icon."""
+        self.system_tray = SystemTray(self)
+        self.system_tray.show_window.connect(self._show_from_tray)
+        self.system_tray.quit_app.connect(self._quit_app)
+        self.system_tray.toggle_watch.connect(self._on_tray_watch_toggled)
+        self.system_tray.set_watch_enabled(self.config.is_watch_folder_enabled())
+        if self.system_tray.is_available:
+            self.system_tray.show()
+
+    def _show_from_tray(self):
+        """Show window from system tray."""
+        self.showNormal()
+        self.activateWindow()
+        self.raise_()
+
+    def _quit_app(self):
+        """Quit the application."""
+        self.system_tray.hide()
+        QApplication.quit()
+
+    def _on_tray_watch_toggled(self, enabled: bool):
+        """Handle watch folder toggle from tray."""
+        if enabled:
+            path = self.config.get_watch_folder_path()
+            if path and os.path.isdir(path):
+                self.watcher.set_watch_path(path)
+                self.watcher.start()
+                self.system_tray.show_message("Watch Folder", f"Watching: {path}")
+        else:
+            self.watcher.stop()
+            self.system_tray.show_message("Watch Folder", "Disabled")
+
+    def closeEvent(self, event):
+        """Minimize to tray instead of closing."""
+        if self.system_tray.is_available:
+            event.ignore()
+            self.hide()
+            self.system_tray.show_message(
+                "BiblioFlow",
+                "Running in background. Double-click tray icon to restore."
+            )
+        else:
+            event.accept()
 
     def _switch_view(self, index: int):
         """Switch to a different view."""

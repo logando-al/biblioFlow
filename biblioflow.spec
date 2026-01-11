@@ -17,7 +17,9 @@ a = Analysis(
     pathex=[project_root],
     binaries=[],
     datas=[
-        ('src/assets/styles.qss', 'src/assets'),
+        ('src/assets/styles.qss', 'assets'),
+        ('src/assets/icon.png', 'assets'),
+        ('src/assets/icon.ico', 'assets'),
     ],
     hiddenimports=[
         'PyQt6.QtCore',
@@ -62,6 +64,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Add icon path here when available
+    icon='src/assets/icon.ico',
     version=None,  # Can add version info file
 )
