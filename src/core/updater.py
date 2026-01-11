@@ -26,7 +26,7 @@ class UpdateChecker:
     def check_for_updates(self) -> bool:
         """
         Check GitHub Releases API for newer version.
-        
+
         Returns:
             bool: True if update available, False otherwise
         """
@@ -63,10 +63,10 @@ class UpdateChecker:
     def download_update(self, progress_callback=None) -> str:
         """
         Download the latest release executable.
-        
+
         Args:
             progress_callback: Optional callback(downloaded, total) for progress
-            
+
         Returns:
             str: Path to downloaded file, or None on failure
         """
@@ -78,7 +78,7 @@ class UpdateChecker:
             response.raise_for_status()
 
             total_size = int(response.headers.get("content-length", 0))
-            
+
             # Download to temp file
             temp_dir = tempfile.gettempdir()
             filename = f"{APP_NAME}-v{self.latest_version}-win64.exe"
@@ -105,10 +105,10 @@ class UpdateChecker:
         1. Waits for current process to exit
         2. Replaces the old exe with new exe
         3. Relaunches the application
-        
+
         Args:
             new_exe_path: Path to the downloaded new executable
-            
+
         Returns:
             bool: True if update script was launched successfully
         """
