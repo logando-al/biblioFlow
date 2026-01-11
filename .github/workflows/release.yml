@@ -36,6 +36,15 @@ jobs:
           Set-Content $file $content
           Write-Host "Updated version.py to $version"
 
+      - name: Update installer.iss version
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $file = "installer.iss"
+          $content = Get-Content $file -Raw
+          $content = $content -replace '#define MyAppVersion "[^"]*"', "#define MyAppVersion `"$version`""
+          Set-Content $file $content
+          Write-Host "Updated installer.iss to $version"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -44,10 +53,18 @@ jobs:
       - name: Build executable
         run: pyinstaller biblioflow.spec
 
-      - name: Rename executable with version
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      - name: Rename installer with version
         run: |
           $version = "${{ steps.version.outputs.VERSION }}"
-          Move-Item "dist/BiblioFlow.exe" "dist/BiblioFlow-v$version-win64.exe"
+          Move-Item "installer_output/BiblioFlow-$version-Setup.exe" "installer_output/BiblioFlow-v$version-Setup.exe"
 
       - name: Generate release notes
         id: notes
@@ -56,14 +73,22 @@ jobs:
           ## BiblioFlow v${{ steps.version.outputs.VERSION }}
 
           ### Downloads
-          - **Windows**: BiblioFlow-v${{ steps.version.outputs.VERSION }}-win64.exe
+          - **Windows Installer**: BiblioFlow-v${{ steps.version.outputs.VERSION }}-Setup.exe (Recommended)
 
           ### Installation
-          1. Download the executable above
-          2. Run BiblioFlow - no installation required!
+          1. Download the installer above
+          2. Run the setup wizard
+          3. Launch BiblioFlow from Start Menu or Desktop shortcut
+
+          ### Features
+          - Drag & drop PDF files for automatic organization
+          - Citation copy (BibTeX, APA 7th, IEEE)
+          - RIS export for Mendeley/Zotero
+          - Watch folder mode for auto-processing
+          - System tray integration
 
           ### Auto-Update
-          If you have a previous version installed, it will automatically prompt you to update.
+          BiblioFlow will automatically notify you when updates are available.
           "@
           echo "NOTES<<EOF" >> $env:GITHUB_OUTPUT
           echo $notes >> $env:GITHUB_OUTPUT
@@ -76,6 +101,6 @@ jobs:
           body: ${{ steps.notes.outputs.NOTES }}
           draft: false
           prerelease: false
-          files: dist/BiblioFlow-v${{ steps.version.outputs.VERSION }}-win64.exe
+          files: installer_output/BiblioFlow-v${{ steps.version.outputs.VERSION }}-Setup.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

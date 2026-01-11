@@ -27,7 +27,6 @@ class QueueItem(QFrame):
 
         # Status icon
         self.status_icon = QLabel()
-        self.set_status("pending")
         layout.addWidget(self.status_icon)
 
         # Filename
@@ -39,6 +38,9 @@ class QueueItem(QFrame):
         self.status_label = QLabel("Pending")
         self.status_label.setStyleSheet("color: #A0A0A0; font-size: 12px;")
         layout.addWidget(self.status_label)
+
+        # Set initial status (after all widgets are created)
+        self.set_status("pending")
 
         self._apply_styles()
 

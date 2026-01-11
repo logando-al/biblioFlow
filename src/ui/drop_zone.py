@@ -1,16 +1,16 @@
 """
 Drag-and-Drop Zone Widget
 
-Handles PDF file drops with animated glow effects.
+Handles PDF file drops with glow effects.
 """
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGraphicsDropShadowEffect, QFileDialog
-from PyQt6.QtCore import Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, QTimer, pyqtProperty
+from PyQt6.QtCore import Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, pyqtProperty
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QColor, QMouseEvent
 import qtawesome as qta
 
 
 class DropZone(QWidget):
-    """Widget for drag-and-drop PDF files with animated glow effects."""
+    """Widget for drag-and-drop PDF files with glow effects."""
 
     files_dropped = pyqtSignal(list)  # List of file paths
 
@@ -18,9 +18,9 @@ class DropZone(QWidget):
         super().__init__()
         self.setAcceptDrops(True)
         self._glow_intensity = 0.0
+        self._is_dragging = False
         self._setup_ui()
         self._setup_glow_effect()
-        self._setup_animations()
 
     def _setup_ui(self):
         """Initialize UI."""
@@ -49,38 +49,15 @@ class DropZone(QWidget):
     def _setup_glow_effect(self):
         """Setup the glow drop shadow effect."""
         self.glow_effect = QGraphicsDropShadowEffect(self)
-        self.glow_effect.setBlurRadius(0)
+        self.glow_effect.setBlurRadius(10)
         self.glow_effect.setColor(QColor(59, 130, 246, 180))  # #3B82F6 with alpha
         self.glow_effect.setOffset(0, 0)
         self.setGraphicsEffect(self.glow_effect)
 
-    def _setup_animations(self):
-        """Setup glow animations."""
-        # Glow pulse animation for idle state
-        self.pulse_timer = QTimer(self)
-        self.pulse_timer.timeout.connect(self._pulse_glow)
-        self.pulse_direction = 1
-        self.pulse_timer.start(50)  # 50ms intervals for smooth animation
-
-        # Drag hover animation
+        # Glow animation for drag hover
         self.glow_animation = QPropertyAnimation(self, b"glowIntensity")
         self.glow_animation.setDuration(200)
         self.glow_animation.setEasingCurve(QEasingCurve.Type.OutCubic)
-
-    def _pulse_glow(self):
-        """Subtle idle pulse effect."""
-        if hasattr(self, '_is_dragging') and self._is_dragging:
-            return  # Don't pulse during drag
-
-        current = self.glow_effect.blurRadius()
-        step = 0.5 * self.pulse_direction
-
-        if current >= 15:
-            self.pulse_direction = -1
-        elif current <= 5:
-            self.pulse_direction = 1
-
-        self.glow_effect.setBlurRadius(max(0, current + step))
 
     @pyqtProperty(float)
     def glowIntensity(self):
