@@ -52,3 +52,7 @@ data/*.json
 # Local config
 .env
 config.local.json
+
+# Project planning (local only)
+_project_init/
+installer_output/
