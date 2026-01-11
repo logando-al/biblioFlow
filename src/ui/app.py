@@ -135,10 +135,20 @@ class MainWindow(QMainWindow):
 
         content_splitter.addWidget(self.content_stack)
 
-        # Right side: Processing queue
+        # Right side: Processing queue (collapsible)
+        self.queue_container = QWidget()
+        queue_container_layout = QVBoxLayout(self.queue_container)
+        queue_container_layout.setContentsMargins(0, 0, 0, 0)
+        queue_container_layout.setSpacing(0)
+
         self.queue_widget = QueueWidget()
-        self.queue_widget.setFixedWidth(300)
-        content_splitter.addWidget(self.queue_widget)
+        self.queue_widget.setFixedWidth(280)
+        queue_container_layout.addWidget(self.queue_widget)
+
+        self.queue_container.setFixedWidth(280)
+        content_splitter.addWidget(self.queue_container)
+
+        self._queue_visible = True
 
         layout.addWidget(content_splitter)
 
@@ -152,18 +162,19 @@ class MainWindow(QMainWindow):
         """Create header with navigation."""
         header = QWidget()
         header.setObjectName("header")
+        header.setFixedHeight(50)
         layout = QHBoxLayout(header)
-        layout.setContentsMargins(20, 15, 20, 15)
+        layout.setContentsMargins(15, 0, 15, 0)
 
         # Logo/Title
         title = QLabel(APP_NAME)
-        title.setStyleSheet("font-size: 20px; font-weight: bold; color: white;")
+        title.setStyleSheet("font-size: 18px; font-weight: bold; color: white;")
         layout.addWidget(title)
 
         layout.addStretch()
 
         # Navigation buttons
-        self.btn_drop = QPushButton(qta.icon('fa5s.cloud-upload-alt', color='white'), "Drop Zone")
+        self.btn_drop = QPushButton(qta.icon('fa5s.file-upload', color='white'), "Drop Zone")
         self.btn_library = QPushButton(qta.icon('fa5s.book', color='white'), "Library")
         self.btn_settings = QPushButton(qta.icon('fa5s.cog', color='white'), "Settings")
 
@@ -177,6 +188,15 @@ class MainWindow(QMainWindow):
 
         # Set initial active state
         self.btn_drop.setChecked(True)
+
+        # Queue toggle button
+        layout.addSpacing(10)
+        self.queue_toggle_btn = QPushButton(qta.icon('fa5s.list', color='#A0A0A0'), "")
+        self.queue_toggle_btn.setObjectName("nav-btn")
+        self.queue_toggle_btn.setFixedWidth(40)
+        self.queue_toggle_btn.setToolTip("Toggle Processing Queue")
+        self.queue_toggle_btn.clicked.connect(self._toggle_queue)
+        layout.addWidget(self.queue_toggle_btn)
 
         return header
 
@@ -240,6 +260,7 @@ class MainWindow(QMainWindow):
 
         # Settings
         self.settings_view.watch_folder_changed.connect(self._on_watch_folder_changed)
+        self.settings_view.check_updates_requested.connect(self._check_for_updates)
 
         # Watcher
         self.watcher.new_file_detected.connect(self._on_watched_file_detected)
@@ -298,6 +319,18 @@ class MainWindow(QMainWindow):
             )
         else:
             event.accept()
+
+    def _toggle_queue(self):
+        """Toggle the processing queue visibility."""
+        self._queue_visible = not self._queue_visible
+        if self._queue_visible:
+            self.queue_container.setFixedWidth(280)
+            self.queue_container.show()
+            self.queue_toggle_btn.setIcon(qta.icon('fa5s.chevron-right', color='#A0A0A0'))
+        else:
+            self.queue_container.setFixedWidth(0)
+            self.queue_container.hide()
+            self.queue_toggle_btn.setIcon(qta.icon('fa5s.chevron-left', color='#A0A0A0'))
 
     def _switch_view(self, index: int):
         """Switch to a different view."""

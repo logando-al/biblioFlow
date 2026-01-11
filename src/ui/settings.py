@@ -19,6 +19,7 @@ class SettingsPanel(QWidget):
 
     settings_changed = pyqtSignal()  # Emitted when settings change
     watch_folder_changed = pyqtSignal(bool, str)  # enabled, path
+    check_updates_requested = pyqtSignal()  # Emitted when Check Now is clicked
 
     def __init__(self, config: ConfigManager = None):
         super().__init__()
@@ -281,8 +282,7 @@ class SettingsPanel(QWidget):
 
     def _check_updates_now(self):
         """Trigger update check."""
-        # This will be connected to the main window's update checker
-        pass
+        self.check_updates_requested.emit()
 
     def _reset_to_defaults(self):
         """Reset all settings to defaults."""

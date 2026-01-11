@@ -29,7 +29,7 @@ class DropZone(QWidget):
 
         # Icon
         self.icon_label = QLabel()
-        self.icon_label.setPixmap(qta.icon('fa5s.cloud-upload-alt', color='#3B82F6').pixmap(64, 64))
+        self.icon_label.setPixmap(qta.icon('fa5s.file-upload', color='#3B82F6').pixmap(64, 64))
         self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.icon_label)
 
@@ -115,7 +115,7 @@ class DropZone(QWidget):
                     self._animate_glow_in()
                     # Update icon color
                     self.icon_label.setPixmap(
-                        qta.icon('fa5s.cloud-upload-alt', color='#60A5FA').pixmap(72, 72)
+                        qta.icon('fa5s.file-upload', color='#60A5FA').pixmap(72, 72)
                     )
                     return
 
@@ -126,7 +126,7 @@ class DropZone(QWidget):
         self.style().polish(self)
         self._animate_glow_out()
         self.icon_label.setPixmap(
-            qta.icon('fa5s.cloud-upload-alt', color='#3B82F6').pixmap(64, 64)
+            qta.icon('fa5s.file-upload', color='#3B82F6').pixmap(64, 64)
         )
 
     def dropEvent(self, event: QDropEvent):
@@ -136,7 +136,7 @@ class DropZone(QWidget):
         self.style().polish(self)
         self._animate_glow_out()
         self.icon_label.setPixmap(
-            qta.icon('fa5s.cloud-upload-alt', color='#3B82F6').pixmap(64, 64)
+            qta.icon('fa5s.file-upload', color='#3B82F6').pixmap(64, 64)
         )
 
         pdf_files = []
