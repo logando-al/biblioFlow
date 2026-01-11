@@ -38,9 +38,7 @@ WizardStyle=modern
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 
-; Appearance
-WizardImageFile=src\assets\icon.png
-WizardSmallImageFile=src\assets\icon.png
+; Appearance - wizard images removed (require BMP format)
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

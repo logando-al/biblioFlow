@@ -458,12 +458,43 @@ class MainWindow(QMainWindow):
 
 
 def run_app():
-    """Run the application."""
+    """Run the application with splash screen."""
+    import time
+    from .splash_screen import show_splash
+
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(__version__)
 
+    # Show splash screen
+    splash = show_splash()
+    splash.set_message("Starting BiblioFlow...")
+    splash.set_progress(10)
+
+    # Simulate loading steps
+    splash.set_message("Loading configuration...")
+    splash.set_progress(30)
+    time.sleep(0.2)
+
+    splash.set_message("Initializing UI...")
+    splash.set_progress(50)
+    time.sleep(0.2)
+
+    splash.set_message("Loading library...")
+    splash.set_progress(70)
+    time.sleep(0.2)
+
+    # Create main window
+    splash.set_message("Preparing workspace...")
+    splash.set_progress(90)
     window = MainWindow()
+
+    splash.set_progress(100)
+    splash.set_message("Ready!")
+    time.sleep(0.3)
+
+    # Finish splash and show main window
+    splash.finish(window)
     window.show()
 
     sys.exit(app.exec())
