@@ -5,7 +5,7 @@ Shows a splash screen with logo and loading progress on startup.
 """
 import os
 from PyQt6.QtWidgets import QSplashScreen, QApplication, QProgressBar
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont
 
 
